@@ -807,26 +807,19 @@
     }
 
     function finishWritingWithScore(score) {
-        const container = document.getElementById('bigCardContainer');
         const btn = document.getElementById('toggleWriteBtn');
 
-        container.classList.remove('writing-active');
-        btn.classList.remove('active-write');
         btn.innerText = '따라쓰기 완료 ✅';
         setMatchRateText(`일치율 ${score}%`, score >= 80);
 
         if (score >= 80) {
-            setTimeout(() => {
-                btn.innerText = '따라쓰기 ✍️';
-                setMatchRateText('');
-                nextCard();
-            }, 900);
-        } else {
-            setTimeout(() => {
-                btn.innerText = '따라쓰기 ✍️';
-                setMatchRateText('');
-            }, 900);
+            return;
         }
+
+        setTimeout(() => {
+            btn.innerText = '따라쓰기 ✍️';
+            setMatchRateText('');
+        }, 900);
     }
 
     function stopDrawing() {
