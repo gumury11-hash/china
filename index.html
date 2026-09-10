@@ -3,56 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gemini 3.5 Flash-Lite 맞춤형 한자 단어 암기 학습기</title>
+    <title>한자 단어 암기 학습기</title>
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #d1d5db;
-            --error-color: #dc2626;
+            --primary-color: #5b63ff;
+            --primary-hover: #464df0;
+            --primary-soft: #eef1ff;
+            --accent-pink: #ff7ac6;
+            --accent-yellow: #ffd86a;
+            --bg-start: #f5f8ff;
+            --bg-end: #eefbf9;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-strong: #ffffff;
+            --text-color: #20263d;
+            --muted-color: #6b728d;
+            --border-color: rgba(123, 133, 168, 0.18);
+            --error-color: #e84d6f;
+            --success-color: #13b981;
+            --shadow-soft: 0 18px 40px rgba(91, 99, 255, 0.13);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            background:
+                radial-gradient(circle at top left, rgba(255, 122, 198, 0.16), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(91, 99, 255, 0.16), transparent 32%),
+                linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
             color: var(--text-color);
             margin: 0;
-            padding: 10px;
+            min-height: 100vh;
+            padding: max(12px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom));
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
             touch-action: manipulation;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         .container {
-            max-width: 100%;
-            width: 100%;
+            width: min(100%, 430px);
             margin: 0 auto;
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 28px;
+            box-shadow: var(--shadow-soft);
+            padding: 18px 16px 20px;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -36px;
+            right: -24px;
+            width: 160px;
+            height: 160px;
+            background: radial-gradient(circle, rgba(255, 122, 198, 0.22) 0%, rgba(255, 122, 198, 0) 72%);
+            pointer-events: none;
         }
 
         h1 {
             text-align: center;
             color: var(--primary-color);
-            font-size: 20px;
-            margin-bottom: 20px;
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-weight: 800;
+            margin: 2px 0 18px;
+            letter-spacing: -0.04em;
             word-break: keep-all;
         }
 
         .api-key-section {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
+            background: linear-gradient(135deg, #fff9db 0%, #fff6ef 32%, #eff6ff 100%);
+            border: 1px solid rgba(255, 205, 99, 0.35);
+            padding: 16px 14px 14px;
+            border-radius: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 10px 22px rgba(255, 185, 77, 0.12);
         }
 
         .api-key-row {
@@ -64,71 +103,80 @@
 
         .api-key-row input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            padding: 13px 14px;
+            border: 1px solid rgba(123, 133, 168, 0.28);
+            border-radius: 12px;
             font-size: 14px;
-            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 1px 4px rgba(91, 99, 255, 0.04);
         }
 
         .btn-api {
-            background-color: #d97706;
+            background: linear-gradient(135deg, #ffb454 0%, #f18f3d 100%);
             color: white;
             border: none;
-            padding: 12px;
-            font-weight: bold;
-            border-radius: 6px;
+            padding: 13px 14px;
+            font-weight: 700;
+            border-radius: 12px;
             cursor: pointer;
             width: 100%;
+            box-shadow: 0 10px 20px rgba(241, 143, 61, 0.22);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
         }
-        .btn-api:hover { background-color: #b45309; }
+        .btn-api:hover {
+            filter: brightness(1.03);
+            transform: translateY(-1px);
+        }
+        .btn-api:active {
+            transform: translateY(1px) scale(0.99);
+            box-shadow: 0 6px 14px rgba(241, 143, 61, 0.18);
+        }
 
         .api-status {
             margin-top: 8px;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 700;
             color: var(--error-color);
             word-break: break-all;
         }
 
         .help-trigger-btn {
-            background-color: #0284c7;
+            background: linear-gradient(135deg, #50b6ff 0%, #2b8fe9 100%);
             color: white;
             border: none;
-            padding: 6px 10px;
-            font-size: 12px;
-            border-radius: 4px;
+            padding: 7px 10px;
+            font-size: 11px;
+            border-radius: 999px;
             cursor: pointer;
+            box-shadow: 0 8px 16px rgba(43, 143, 233, 0.18);
         }
-        .help-trigger-btn:hover { background-color: #0369a1; }
+        .help-trigger-btn:hover { filter: brightness(1.03); }
 
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: rgba(20, 25, 40, 0.45);
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            padding: 15px;
-            box-sizing: border-box;
+            padding: 16px;
         }
 
         .modal-content {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 20px 18px 18px;
+            border-radius: 18px;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 16px 38px rgba(18, 20, 38, 0.2);
             position: relative;
             line-height: 1.6;
-            box-sizing: border-box;
         }
 
         .modal-close {
             position: absolute;
-            top: 15px; right: 15px;
+            top: 12px; right: 12px;
             background: none;
             border: none;
             font-size: 18px;
@@ -140,12 +188,12 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 8px;
+            margin-bottom: 16px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.7);
             border: 1px solid var(--border-color);
-            box-sizing: border-box;
+            border-radius: 18px;
+            box-shadow: 0 8px 18px rgba(40, 58, 117, 0.05);
         }
 
         .form-group {
@@ -154,205 +202,301 @@
         }
 
         label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: var(--muted-color);
         }
 
         select, button {
-            padding: 12px;
+            padding: 12px 14px;
             font-size: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border: 1px solid rgba(123, 133, 168, 0.2);
+            border-radius: 12px;
             outline: none;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9);
             box-sizing: border-box;
+        }
+
+        select {
+            appearance: none;
+            background-image: linear-gradient(45deg, transparent 50%, #5b63ff 50%), linear-gradient(135deg, #5b63ff 50%, transparent 50%);
+            background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+            padding-right: 34px;
         }
 
         .action-buttons {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .btn-load {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #7c6bff 100%);
             color: white;
-            font-weight: bold;
+            font-weight: 800;
             cursor: pointer;
             width: 100%;
-            padding: 14px;
-            box-sizing: border-box;
+            padding: 15px 14px;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 14px 28px rgba(91, 99, 255, 0.22);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
         }
-        .btn-load:hover { background-color: var(--primary-hover); }
-        .btn-load:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        .btn-load:hover {
+            filter: brightness(1.03);
+            transform: translateY(-1px);
+        }
+        .btn-load:active {
+            transform: translateY(1px) scale(0.995);
+            box-shadow: 0 8px 16px rgba(91, 99, 255, 0.18);
+        }
+        .btn-load:disabled { background: linear-gradient(135deg, #b9c1e9 0%, #dfe5f7 100%); cursor: not-allowed; box-shadow: none; }
 
         .btn-all-speak {
-            background-color: #059669;
+            background: linear-gradient(135deg, #0ab98a 0%, #17c79a 100%);
             color: white;
-            font-weight: bold;
+            font-weight: 800;
             cursor: pointer;
             width: 100%;
             padding: 14px;
-            box-sizing: border-box;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 14px 26px rgba(10, 185, 138, 0.18);
             display: none;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
         }
-        .btn-all-speak:hover { background-color: #047857; }
-        .btn-all-speak:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        .btn-all-speak:hover {
+            filter: brightness(1.03);
+            transform: translateY(-1px);
+        }
+        .btn-all-speak:active {
+            transform: translateY(1px) scale(0.995);
+            box-shadow: 0 8px 16px rgba(10, 185, 138, 0.14);
+        }
+        .btn-all-speak:disabled { background: linear-gradient(135deg, #b8dcd5 0%, #d9eeeb 100%); cursor: not-allowed; box-shadow: none; }
 
-        /* 빅 카드 모드 스타일 */
         .big-card-container {
             display: none;
             flex-direction: column;
             align-items: center;
-            background: #fff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
+            background: linear-gradient(180deg, #ffffff 0%, #f7f8ff 100%);
+            border: 1px solid rgba(123, 133, 168, 0.18);
+            border-radius: 24px;
+            padding: 18px 14px 16px;
             box-sizing: border-box;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            transition: opacity 0.3s ease;
+            box-shadow: 0 16px 32px rgba(94, 108, 176, 0.08);
+            margin-bottom: 18px;
+            width: 100%;
+            overflow: hidden;
+            animation: cardIn 0.28s ease;
         }
 
-        /* 따라쓰기 모드 활성화 시 카드 내부 요소들을 옅게 처리하는 클래스 */
-        .big-card-container.writing-active .card-progress,
-        .big-card-container.writing-active .big-info,
-        .big-card-container.writing-active .big-sub {
-            opacity: 0.25;
-            transition: opacity 0.3s ease;
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
-        /* 한자 글자 영역: 캔버스와 겹쳐서 투명하게 띄우기 위한 래퍼 */
+        .card-progress {
+            font-size: 12px;
+            color: var(--muted-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: var(--primary-soft);
+            border-radius: 999px;
+            padding: 5px 10px;
+        }
+
         .hanja-display-wrapper {
             position: relative;
-            width: 260px;
+            width: min(100%, 260px);
             height: 260px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
+            border-radius: 22px;
+            background: linear-gradient(160deg, rgba(91, 99, 255, 0.09), rgba(255, 122, 198, 0.08));
+            border: 1px solid rgba(91, 99, 255, 0.1);
         }
 
         .big-hanja {
-            font-size: 160px;
-            font-weight: bold;
-            color: var(--primary-color);
+            font-size: 132px;
+            font-weight: 800;
+            color: rgba(91, 99, 255, 0.9);
             line-height: 1;
             margin: 0;
             user-select: none;
-            transition: opacity 0.3s ease, color 0.3s ease;
+            text-align: center;
             position: absolute;
             z-index: 1;
+            transition: color 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+            text-shadow: 0 8px 22px rgba(91, 99, 255, 0.06);
+            opacity: 1;
+            filter: none;
         }
 
-        /* 따라쓰기 활성화 시 배경 한자 옅게 만들기 */
         .big-card-container.writing-active .big-hanja {
-            opacity: 0.2;
-            color: #9ca3af;
+            color: rgba(91, 99, 255, 0.2);
+            filter: blur(0.3px);
+            opacity: 0.85;
         }
 
-        /* 손글씨 캔버스 영역 (한자 바로 위로 겹침) */
         .drawing-canvas {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 260px;
-            height: 260px;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             background-color: transparent;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
+            border: 2px dashed rgba(91, 99, 255, 0.20);
+            border-radius: 22px;
             touch-action: none;
-            cursor: crosshair;
+            cursor: not-allowed;
             z-index: 2;
-            display: none;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, border-color 0.2s ease;
         }
 
         .big-card-container.writing-active .drawing-canvas {
-            display: block;
-            border-color: var(--primary-color);
-            background-color: rgba(255, 255, 255, 0.4);
+            border-color: rgba(91, 99, 255, 0.45);
+            opacity: 1;
+            cursor: crosshair;
+            pointer-events: auto;
         }
 
         .canvas-controls {
-            display: none;
-            gap: 10px;
-            margin-top: 10px;
-            width: 100%;
-            max-width: 260px;
-        }
-
-        .big-card-container.writing-active .canvas-controls {
             display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            width: min(100%, 260px);
         }
 
         .canvas-controls button {
             flex: 1;
-            padding: 8px;
+            padding: 9px 8px;
             font-size: 12px;
-            background-color: #f3f4f6;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            background: var(--primary-soft);
+            border: 1px solid rgba(91, 99, 255, 0.12);
+            border-radius: 10px;
             cursor: pointer;
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        .match-rate {
+            display: none;
+            margin-top: 10px;
+            width: min(100%, 260px);
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #4a587d;
+            background: rgba(91, 99, 255, 0.06);
+            border: 1px solid rgba(91, 99, 255, 0.08);
+            border-radius: 999px;
+            padding: 7px 10px;
+        }
+
+        .big-info {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #2d3454;
+            margin: 14px 0 5px;
+            text-align: center;
+            word-break: keep-all;
+            letter-spacing: -0.03em;
+        }
+
+        .big-sub {
+            font-size: 12px;
+            color: var(--muted-color);
+            margin-bottom: 14px;
+            text-align: center;
+            word-break: keep-all;
+            font-weight: 700;
         }
 
         .card-btn-group {
             display: flex;
             gap: 8px;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
         .card-btn-group button {
             flex: 1;
-            padding: 10px;
+            padding: 11px 10px;
             font-size: 13px;
-            font-weight: bold;
-            background-color: #e5e7eb;
-            border: none;
-            border-radius: 6px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #e9ebff 0%, #eef1ff 100%);
+            border: 1px solid rgba(91, 99, 255, 0.12);
+            border-radius: 12px;
             cursor: pointer;
+            color: var(--text-color);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
         }
-        .card-btn-group button:hover { background-color: #d1d5db; }
+        .card-btn-group button:hover {
+            filter: brightness(1.02);
+            transform: translateY(-1px);
+        }
+        .card-btn-group button:active {
+            transform: translateY(1px);
+        }
         .card-btn-group button.active-write {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6d73ff 100%);
             color: white;
+            border: none;
+            box-shadow: 0 10px 18px rgba(91, 99, 255, 0.18);
         }
 
         .nav-buttons {
             display: flex;
             gap: 10px;
             width: 100%;
-            margin-top: 15px;
-        }
-
-        .big-card-container.writing-active .nav-buttons {
-            opacity: 0.3;
-            pointer-events: none; /* 따라쓰기 중에는 이전/다음 이동 차단 */
         }
 
         .nav-buttons button {
             flex: 1;
-            padding: 12px;
+            padding: 12px 14px;
             font-size: 14px;
-            font-weight: bold;
-            background-color: #4f46e5;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6a69ff 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 14px;
             cursor: pointer;
+            box-shadow: 0 12px 22px rgba(91, 99, 255, 0.2);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+        }
+        .nav-buttons button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            filter: brightness(1.02);
+        }
+        .nav-buttons button:active:not(:disabled) {
+            transform: translateY(1px) scale(0.995);
+            box-shadow: 0 8px 16px rgba(91, 99, 255, 0.16);
         }
         .nav-buttons button:disabled {
-            background-color: #9ca3af;
+            background: linear-gradient(135deg, #c4caef 0%, #dfe5f5 100%);
+            color: rgba(255,255,255,0.8);
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         #historySection {
-            margin-top: 30px;
-            border-top: 2px solid var(--border-color);
-            padding-top: 15px;
-            box-sizing: border-box;
+            margin-top: 22px;
+            border-top: 1px solid rgba(123, 133, 168, 0.18);
+            padding-top: 16px;
         }
 
         .history-list {
@@ -363,15 +507,20 @@
         }
 
         .history-item {
-            background: #f9fafb;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(123, 133, 168, 0.18);
+            border-radius: 14px;
             padding: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-sizing: border-box;
             gap: 10px;
+            box-shadow: 0 8px 16px rgba(28, 34, 54, 0.04);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .history-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(28, 34, 54, 0.06);
         }
 
         .history-content {
@@ -385,8 +534,8 @@
         }
 
         .history-time {
-            font-weight: bold;
-            font-size: 14px;
+            font-weight: 800;
+            font-size: 13px;
             color: var(--text-color);
             margin-bottom: 2px;
             display: block;
@@ -394,36 +543,62 @@
 
         .history-desc {
             font-size: 11px;
-            color: #6b7280;
-            line-height: 1.3;
+            color: var(--muted-color);
+            line-height: 1.4;
         }
 
         .btn-delete-icon {
-            background: none;
+            background: rgba(232, 77, 111, 0.08);
             border: none;
             color: var(--error-color);
-            font-size: 18px;
+            font-size: 17px;
             cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 4px;
+            padding: 7px 9px;
+            border-radius: 10px;
             flex-shrink: 0;
         }
-        .btn-delete-icon:hover { background-color: #fee2e2; }
+        .btn-delete-icon:hover { background: rgba(232, 77, 111, 0.12); }
 
         .loading-overlay {
             display: none;
             text-align: center;
-            padding: 20px;
-            font-size: 14px;
+            padding: 16px 12px;
+            font-size: 13px;
             color: var(--primary-color);
-            font-weight: bold;
+            font-weight: 800;
+            background: rgba(91, 99, 255, 0.06);
+            border-radius: 14px;
+            border: 1px solid rgba(91, 99, 255, 0.12);
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 360px) {
+            body {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+                border-radius: 22px;
+            }
+
+            .big-hanja {
+                font-size: 112px;
+            }
+
+            .hanja-display-wrapper,
+            .drawing-canvas {
+                height: 230px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Gemini 3.5 Flash-Lite 한자 암기장</h1>
+    <h1>한자 암기장</h1>
 
     <div id="apiKeySection" class="api-key-section">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -481,7 +656,7 @@
     <div id="bigCardContainer" class="big-card-container">
         <div id="cardProgress" class="card-progress">1 / 10</div>
         
-        <!-- 한자와 캔버스가 정중앙에 겹쳐서 배치되는 래퍼 -->
+        <!-- 한자와 캔버스가 완벽하게 겹쳐서 칸을 벗어나지 않도록 고정된 영역 -->
         <div class="hanja-display-wrapper">
             <div id="bigHanja" class="big-hanja">天</div>
             <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
@@ -491,7 +666,9 @@
             <button onclick="clearCanvas()">지우기</button>
         </div>
 
-        <div id="bigInfo" class="big-info">[천] 하늘</div>
+        <div id="matchRateText" class="match-rate">일치율: 0%</div>
+
+        <div id="bigInfo" class="big-info" style="margin-top: 15px;">[천] 하늘</div>
         <div id="bigSub" class="big-sub">획수: 4획</div>
 
         <div class="card-btn-group">
@@ -519,6 +696,7 @@
     let currentIndex = 0;
     let canvas, ctx;
     let isDrawing = false;
+    let userStrokeCount = 0;
     let historyList = [];
     let excludedHanjaList = [];
 
@@ -573,6 +751,9 @@
 
     function startDrawing(e) {
         e.preventDefault();
+        if (!isDrawing) {
+            userStrokeCount += 1;
+        }
         isDrawing = true;
         const pos = getPosition(e);
         ctx.beginPath();
@@ -587,12 +768,82 @@
         ctx.stroke();
     }
 
+    function setMatchRateText(text, success = false) {
+        const el = document.getElementById('matchRateText');
+        if (!el) return;
+        if (!text) {
+            el.style.display = 'none';
+            el.textContent = '';
+            return;
+        }
+        el.textContent = text;
+        el.style.display = 'block';
+        el.style.color = success ? '#10b981' : '#4a587d';
+        el.style.background = success ? 'rgba(16, 185, 129, 0.08)' : 'rgba(91, 99, 255, 0.06)';
+    }
+
+    function resetWritingMetrics() {
+        userStrokeCount = 0;
+    }
+
+    function getCurrentMatchRate() {
+        if (!currentLoadedWords.length) return 0;
+
+        const targetStrokes = Number(currentLoadedWords[currentIndex]?.strokes || 0);
+        if (!targetStrokes || userStrokeCount === 0) return 0;
+
+        const diff = Math.abs(userStrokeCount - targetStrokes);
+        if (diff === 0) return 100;
+        if (diff === 1) return 80;
+        if (diff === 2) return 60;
+        if (diff === 3) return 40;
+        return Math.max(0, 100 - diff * 25);
+    }
+
+    function finishWritingWithScore(score) {
+        const container = document.getElementById('bigCardContainer');
+        const btn = document.getElementById('toggleWriteBtn');
+
+        container.classList.remove('writing-active');
+        btn.classList.remove('active-write');
+        btn.innerText = '따라쓰기 완료 ✅';
+        setMatchRateText(`일치율 ${score}%`, score >= 80);
+
+        if (score >= 80) {
+            setTimeout(() => {
+                btn.innerText = '따라쓰기 ✍️';
+                setMatchRateText('');
+                nextCard();
+            }, 900);
+        } else {
+            setTimeout(() => {
+                btn.innerText = '따라쓰기 ✍️';
+                setMatchRateText('');
+            }, 900);
+        }
+    }
+
     function stopDrawing() {
+        if (!isDrawing) return;
         isDrawing = false;
+
+        const container = document.getElementById('bigCardContainer');
+        if (!container.classList.contains('writing-active')) return;
+
+        const score = getCurrentMatchRate();
+        if (score > 0) {
+            setMatchRateText(`일치율 ${score}%`, score >= 80);
+        }
+
+        if (score >= 80) {
+            finishWritingWithScore(score);
+        }
     }
 
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        resetWritingMetrics();
+        setMatchRateText('');
     }
 
     function toggleWritingPad() {
@@ -603,12 +854,16 @@
             container.classList.remove('writing-active');
             btn.classList.remove('active-write');
             btn.innerText = "따라쓰기 ✍️";
-        } else {
-            container.classList.add('writing-active');
-            btn.classList.add('active-write');
-            btn.innerText = "따라쓰기 종료 ✕";
+            setMatchRateText('');
             clearCanvas();
+            return;
         }
+
+        container.classList.add('writing-active');
+        btn.classList.add('active-write');
+        btn.innerText = "따라쓰기 종료 ✕";
+        clearCanvas();
+        setMatchRateText('');
     }
 
     function saveApiKey() {
@@ -713,12 +968,19 @@
             excludePromptStr = `\n[중요 제약 조건] 아래 나열된 한자들은 이미 학습했으므로 절대 다시 생성하지 말고, 완전히 새로운 다른 한자 단어 10개를 골라주세요: [${recentExcludes}]`;
         }
 
-        const prompt = `사용자가 '${situationText}' 주제에 대해 '${levelText}(${strokeCondition})' 난이도의 새로운 한자 단어 10개를 배우려고 합니다.${excludePromptStr}
+        const isIdiomMode = selectedSituation === 'idiom';
+        const shapeRule = isIdiomMode
+            ? "사자성어 또는 복합한자 표현만 생성하고, 단일 한자(예: 天, 人, 山), 무관한 고유명사, 또는 일반적인 낱말은 제외하세요. 표현은 2~4글자 범위로 만들고, 실제로 쓰이는 사자성어/복합어 느낌이 나야 합니다."
+            : "한자 단어를 생성하되, 각 항목은 한자 표기와 뜻이 직접 연결되어야 하며 단일 한자나 의미가 불명확한 표현은 제외하세요.";
+
+        const prompt = `사용자가 '${situationText}' 주제에 대해 '${levelText}(${strokeCondition})' 난이도의 새로운 한자 표현 10개를 배우려고 합니다.${excludePromptStr}
+${shapeRule}
 반드시 아래 JSON 배열 형식으로만 응답해주세요. 마크다운 코드 블록이나 다른 설명 문구는 절대 포함하지 마세요.
 [
-  {"word": "한자", "sound": "음독 또는 훈독 (예: 천)", "meaning": "뜻풀이", "strokes": 획수숫자},
+  {"word": "한자 표기 (사자성어/복합어 또는 한자어 단어)", "sound": "음독 또는 훈독 예시", "meaning": "뜻풀이", "strokes": 획수숫자},
   ...
-]`;
+]
+중요: 'word'는 반드시 한자 표기만 넣고, 영어·숫자·기호·짧은 단일 한자, 또는 상황과 무관한 표현을 절대 넣지 마세요.`;
 
         document.getElementById('loadingMsg').style.display = 'block';
         document.getElementById('loadBtn').disabled = true;
@@ -742,14 +1004,29 @@
             const parsedWords = JSON.parse(cleanedText);
 
             if (Array.isArray(parsedWords) && parsedWords.length > 0) {
-                currentLoadedWords = parsedWords;
+                const filteredWords = parsedWords.filter(item => {
+                    if (!item || !item.word || typeof item.word !== 'string') return false;
+                    const word = item.word.trim();
+                    if (!word) return false;
+                    if (/^[A-Za-z0-9\s]+$/.test(word)) return false;
+                    if (selectedSituation === 'idiom') {
+                        return word.length >= 2 && word.length <= 4 && !/^[\u4E00-\u9FFF]$/.test(word);
+                    }
+                    return word.length >= 1;
+                });
+
+                if (filteredWords.length < 5) {
+                    throw new Error("사자성어/복합단어 주제에 맞는 결과를 찾지 못했습니다. 다시 시도해주세요.");
+                }
+
+                currentLoadedWords = filteredWords.slice(0, 10);
                 currentIndex = 0;
                 renderCurrentCard();
                 document.getElementById('bigCardContainer').style.display = 'flex';
                 document.getElementById('allSpeakBtn').style.display = 'block';
                 document.getElementById('allSpeakBtn').disabled = false;
 
-                parsedWords.forEach(item => {
+                currentLoadedWords.forEach(item => {
                     if (item.word && !excludedHanjaList.includes(item.word)) {
                         excludedHanjaList.push(item.word);
                     }
@@ -780,7 +1057,6 @@
         document.getElementById('prevBtn').disabled = (currentIndex === 0);
         document.getElementById('nextBtn').innerText = (currentIndex === currentLoadedWords.length - 1) ? "처음으로" : "다음 단어";
 
-        // 카드 변경 시 따라쓰기 모드 초기화
         const container = document.getElementById('bigCardContainer');
         const btn = document.getElementById('toggleWriteBtn');
         container.classList.remove('writing-active');
