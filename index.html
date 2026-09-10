@@ -626,11 +626,11 @@
 
     <div class="control-panel">
         <div class="form-group">
-            <label for="levelSelect">한자 난이도 (획수 기준)</label>
+            <label for="levelSelect">한자 난이도</label>
             <select id="levelSelect">
-                <option value="beginner">초급 (획수 5개 이하)</option>
-                <option value="intermediate">중급 (획수 10개 이하)</option>
-                <option value="advanced">고급 (획수 10개 이상)</option>
+                <option value="beginner">초급</option>
+                <option value="intermediate">중급</option>
+                <option value="advanced">고급</option>
             </select>
         </div>
 
@@ -640,6 +640,12 @@
                 <option value="nature">자연/방위</option>
                 <option value="number">숫자/시간/인간</option>
                 <option value="society">사회/학교/생활</option>
+                <option value="family">가족/감정/관계</option>
+                <option value="work">직업/경제/교육</option>
+                <option value="technology">과학/기술/미래</option>
+                <option value="travel">교통/여행/도시</option>
+                <option value="health">건강/식습관/안전</option>
+                <option value="culture">예술/문화/예절</option>
                 <option value="idiom">사자성어 및 복합단어</option>
             </select>
         </div>
@@ -957,6 +963,22 @@
         const levelText = levelSelect.options[levelSelect.selectedIndex].text;
         const situationText = situationSelect.options[situationSelect.selectedIndex].text;
 
+        const situationMap = {
+            nature: { label: '자연/방위', focus: '자연, 계절, 날씨, 지형, 방위, 생태' },
+            number: { label: '숫자/시간/인간', focus: '숫자, 시간, 인간의 삶, 신체, 관계' },
+            society: { label: '사회/학교/생활', focus: '사회, 학교, 생활, 조직, 일상' },
+            family: { label: '가족/감정/관계', focus: '가족, 감정, 사랑, 우정, 관계' },
+            work: { label: '직업/경제/교육', focus: '직업, 일, 돈, 경제, 학문, 교육' },
+            technology: { label: '과학/기술/미래', focus: '과학, 기술, 기계, 미래, 혁신' },
+            travel: { label: '교통/여행/도시', focus: '교통, 여행, 도로, 이동, 도시 생활' },
+            health: { label: '건강/식습관/안전', focus: '건강, 식사, 운동, 안전, 생활 습관' },
+            culture: { label: '예술/문화/예절', focus: '예술, 문학, 전통, 예절, 문화' },
+            idiom: { label: '사자성어 및 복합단어', focus: '사자성어, 복합어, 전통 표현, 깊은 의미의 단어' }
+        };
+
+        const selectedSituationMeta = situationMap[selectedSituation] || situationMap.nature;
+        const effectiveSituationText = selectedSituationMeta.label;
+
         let strokeCondition = "";
         if (selectedLevel === 'beginner') strokeCondition = "획수가 5개 이하인 한자들 위주로";
         else if (selectedLevel === 'intermediate') strokeCondition = "획수가 10개 이하인 한자들 위주로";
@@ -973,8 +995,11 @@
             ? "사자성어 또는 복합한자 표현만 생성하고, 단일 한자(예: 天, 人, 山), 무관한 고유명사, 또는 일반적인 낱말은 제외하세요. 표현은 2~4글자 범위로 만들고, 실제로 쓰이는 사자성어/복합어 느낌이 나야 합니다."
             : "한자 단어를 생성하되, 각 항목은 한자 표기와 뜻이 직접 연결되어야 하며 단일 한자나 의미가 불명확한 표현은 제외하세요.";
 
-        const prompt = `사용자가 '${situationText}' 주제에 대해 '${levelText}(${strokeCondition})' 난이도의 새로운 한자 표현 10개를 배우려고 합니다.${excludePromptStr}
+        const topicRule = `반드시 '${effectiveSituationText}' 주제와 직접 관련된 의미만 생성하세요. 핵심 키워드: ${selectedSituationMeta.focus}. 이와 무관한 표현은 제외하고, 사용자가 실제로 이 주제에서 배울 수 있는 한자어/복합어만 뽑아주세요.`;
+
+        const prompt = `사용자가 '${effectiveSituationText}' 주제에 대해 '${levelText}(${strokeCondition})' 난이도의 새로운 한자 표현 10개를 배우려고 합니다.${excludePromptStr}
 ${shapeRule}
+${topicRule}
 반드시 아래 JSON 배열 형식으로만 응답해주세요. 마크다운 코드 블록이나 다른 설명 문구는 절대 포함하지 마세요.
 [
   {"word": "한자 표기 (사자성어/복합어 또는 한자어 단어)", "sound": "음독 또는 훈독 예시", "meaning": "뜻풀이", "strokes": 획수숫자},
