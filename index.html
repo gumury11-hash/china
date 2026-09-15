@@ -617,9 +617,9 @@
             <button class="modal-close" onclick="closeHelpModal()">✕</button>
             <h3 style="margin-top: 0; color: #0284c7; font-size: 18px;">💡 API 키 발급 방법</h3>
             <ol style="padding-left: 20px; font-size: 13px;">
-                <li><strong>Google AI Studio 접속:</strong> (<a href="https://aistudio.google.com/" target="_blank">aistudio.google.com</a>) 로그인</li>
-                <li><strong>API 키 생성:</strong> 상단/좌측 <strong>'Get API key'</strong> 클릭</li>
-                <li><strong>복사 후 등록:</strong> 생성된 키(<code>AIzaSy...</code>)를 복사해 입력창에 붙여넣기</li>
+                <li><strong>Google AI Studio 접속:</strong> (<a href="https://aistudio.google.com/api-keys" target="_blank">aistudio.google.com</a>) 로그인</li>
+                <li><strong>API 키 생성:</strong> 좌측 상단 <strong>API 키 만들기</strong> 클릭</li>
+                <li><strong>생성된  API키 선택:</strong> 생성된 키(<code>AQ.Ab...</code>)를 복사해 입력창에 붙여넣기</li>
             </ol>
         </div>
     </div>
@@ -705,9 +705,16 @@
     let userStrokeCount = 0;
     let historyList = [];
     let excludedHanjaList = [];
+    const SHARED_API_KEY_STORAGE = "gemini_api_key";
+    const LEGACY_API_KEY_STORAGE = "gemini_flash_lite_key";
 
     window.onload = function() {
-        const savedKey = localStorage.getItem("gemini_flash_lite_key");
+        const savedKey = localStorage.getItem(SHARED_API_KEY_STORAGE)
+            || localStorage.getItem(LEGACY_API_KEY_STORAGE);
+        // 기존 한자학습 전용 키가 있으면 공용 키로 자동 이전
+        if (savedKey && !localStorage.getItem(SHARED_API_KEY_STORAGE)) {
+            localStorage.setItem(SHARED_API_KEY_STORAGE, savedKey);
+        }
         if (savedKey) {
             userApiKey = savedKey;
             applyRegisteredState();
@@ -872,7 +879,7 @@
             return;
         }
         userApiKey = inputVal;
-        localStorage.setItem("gemini_flash_lite_key", userApiKey);
+        localStorage.setItem(SHARED_API_KEY_STORAGE, userApiKey);
         applyRegisteredState();
         alert("API 키가 등록되었습니다.");
     }
